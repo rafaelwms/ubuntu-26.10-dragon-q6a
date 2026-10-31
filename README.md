@@ -31,7 +31,7 @@ Custom Ubuntu 26.10 images for the [Radxa Dragon Q6A](https://radxa.com/products
 | NPU base stack: `/dev/fastrpc-adsp`/`-cdsp` with user ACL, `adsp`/`cdsp` remoteprocs running, `adsprpcd`/`cdsprpcd` active | yes | not tested yet |
 | NPU inference (needs the Qualcomm QAIRT SDK, not bundled), long-term use | **not verified yet** | not tested yet |
 
-Known cosmetic issue: `systemd-modules-load.service` is reported as failed after the first boot (all audio modules are present and audio works; the suspect is the WSA macro module, which this board does not use).
+Known cosmetic issue: `systemd-modules-load.service` is reported as failed at boot (all audio modules are present and audio works; loading every listed module by hand afterwards succeeds, so the cause is probably early-boot timing and is still under investigation).
 
 Kernel: **Linux 7.2.9** (mainline, via Armbian `edge`, same as the stable project). Desktop: GNOME Shell 51.0, native Firefox (Mozilla `.deb`, no snap), `gnome-software`.
 
@@ -93,7 +93,7 @@ Imagens customizadas do Ubuntu 26.10 para a [Radxa Dragon Q6A](https://radxa.com
 
 ### O que foi testado (uma placa, uma pessoa)
 
-Desktop, com kernel **7.2.9**, testado numa placa: boot por SSD externo em USB 3.0 ✅, boot pelo NVMe interno (rootfs copiado para o espaço livre e carregado pelo rEFInd) ✅, HDMI ✅, Wi-Fi ✅, Bluetooth ✅, LAN cabeada ✅, áudio (HDMI e jack de fone) ✅, `apt update && apt upgrade` sem pendências e sem snap ✅, base da NPU (`/dev/fastrpc-*` com ACL do usuário, `adsp`/`cdsp` rodando, `adsprpcd`/`cdsprpcd` ativos) ✅. **Ainda não verificados:** inferência na NPU (exige o SDK QAIRT da Qualcomm, não incluído) e uso prolongado. Problema cosmético conhecido: o `systemd-modules-load.service` aparece como falho após o primeiro boot (os módulos de áudio existem e o som funciona; o suspeito é o módulo WSA, que a placa não usa). **Server:** construído, ainda não testado em hardware.
+Desktop, com kernel **7.2.9**, testado numa placa: boot por SSD externo em USB 3.0 ✅, boot pelo NVMe interno (rootfs copiado para o espaço livre e carregado pelo rEFInd) ✅, HDMI ✅, Wi-Fi ✅, Bluetooth ✅, LAN cabeada ✅, áudio (HDMI e jack de fone) ✅, `apt update && apt upgrade` sem pendências e sem snap ✅, base da NPU (`/dev/fastrpc-*` com ACL do usuário, `adsp`/`cdsp` rodando, `adsprpcd`/`cdsprpcd` ativos) ✅. **Ainda não verificados:** inferência na NPU (exige o SDK QAIRT da Qualcomm, não incluído) e uso prolongado. Problema cosmético conhecido: o `systemd-modules-load.service` aparece como falho no boot (os módulos de áudio existem e o som funciona; carregar à mão todos os módulos da lista depois funciona, então a causa provável é a temporização no início do boot, ainda em investigação). **Server:** construído, ainda não testado em hardware.
 
 ### Por que não o kernel 7.3 (que o Ubuntu 26.10 usa)?
 
