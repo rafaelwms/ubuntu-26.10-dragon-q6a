@@ -21,11 +21,17 @@ Custom Ubuntu 26.10 images for the [Radxa Dragon Q6A](https://radxa.com/products
 | | Desktop | Server |
 |---|---|---|
 | Boots from external SSD over USB 3.0 | yes | built, not tested yet |
+| Boots from the internal NVMe (root partition copied into free space, loaded by rEFInd) | yes | not tested yet |
 | HDMI | yes | not tested yet |
-| Wi-Fi | shown connected in the top bar | not tested yet |
-| Bluetooth | on, lists nearby devices | not tested yet |
+| Wi-Fi | yes | not tested yet |
+| Bluetooth | yes | not tested yet |
+| Wired LAN | yes | not tested yet |
+| Audio: HDMI and 3.5 mm headphone jack | yes | not tested yet |
 | `apt update && apt upgrade` | yes, "All packages are up to date" (Mozilla + `stonking` repos, no snap) | not tested yet |
-| Audio, NPU (`/dev/fastrpc-*`), long-term use, native NVMe boot | **not verified yet** | not tested yet |
+| NPU base stack: `/dev/fastrpc-adsp`/`-cdsp` with user ACL, `adsp`/`cdsp` remoteprocs running, `adsprpcd`/`cdsprpcd` active | yes | not tested yet |
+| NPU inference (needs the Qualcomm QAIRT SDK, not bundled), long-term use | **not verified yet** | not tested yet |
+
+Known cosmetic issue: `systemd-modules-load.service` is reported as failed after the first boot (all audio modules are present and audio works; the suspect is the WSA macro module, which this board does not use).
 
 Kernel: **Linux 7.2.9** (mainline, via Armbian `edge`, same as the stable project). Desktop: GNOME Shell 51.0, native Firefox (Mozilla `.deb`, no snap), `gnome-software`.
 
@@ -87,7 +93,7 @@ Imagens customizadas do Ubuntu 26.10 para a [Radxa Dragon Q6A](https://radxa.com
 
 ### O que foi testado (uma placa, uma pessoa)
 
-Desktop, com kernel **7.2.9**: boot por SSD externo em USB 3.0 ✅, HDMI ✅, Wi-Fi mostrado como conectado ✅, Bluetooth ligado e listando dispositivos ✅, `apt update && apt upgrade` sem pendências e sem snap ✅. **Ainda não verificados:** áudio, NPU (`/dev/fastrpc-*`), uso prolongado e boot pelo slot NVMe nativo. **Server:** construído, ainda não testado em hardware.
+Desktop, com kernel **7.2.9**, testado numa placa: boot por SSD externo em USB 3.0 ✅, boot pelo NVMe interno (rootfs copiado para o espaço livre e carregado pelo rEFInd) ✅, HDMI ✅, Wi-Fi ✅, Bluetooth ✅, LAN cabeada ✅, áudio (HDMI e jack de fone) ✅, `apt update && apt upgrade` sem pendências e sem snap ✅, base da NPU (`/dev/fastrpc-*` com ACL do usuário, `adsp`/`cdsp` rodando, `adsprpcd`/`cdsprpcd` ativos) ✅. **Ainda não verificados:** inferência na NPU (exige o SDK QAIRT da Qualcomm, não incluído) e uso prolongado. Problema cosmético conhecido: o `systemd-modules-load.service` aparece como falho após o primeiro boot (os módulos de áudio existem e o som funciona; o suspeito é o módulo WSA, que a placa não usa). **Server:** construído, ainda não testado em hardware.
 
 ### Por que não o kernel 7.3 (que o Ubuntu 26.10 usa)?
 
