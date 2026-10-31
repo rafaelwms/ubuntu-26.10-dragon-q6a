@@ -4,6 +4,8 @@
 
 > **Experimental port.** Ubuntu 26.10 is an *interim* release (about 9 months of support, **not LTS**). This repository is a feasibility study that builds on what we learned in the stable project, [ubuntu-26.04.1-dragon-q6a](https://github.com/rafaelwms/ubuntu-26.04.1-dragon-q6a) (Ubuntu 26.04.1 LTS, kernel 7.2.9 / 6.18.2). If you want something to rely on, use that one.
 
+> **Current release (v1.0.0): Desktop image only.** The Server image will be added to a later release, after hardware testing.
+
 🇧🇷 **[Leia em português mais abaixo](#português)**
 
 ---
@@ -76,6 +78,8 @@ Needs Docker and about 25 GB free. The arm64 rootfs is built through `qemu-user`
 ---
 
 ## Português
+
+> **Release atual (v1.0.0): só a imagem Desktop.** A imagem Server entra em uma release futura, depois de testada em hardware.
 
 ### O que é
 
