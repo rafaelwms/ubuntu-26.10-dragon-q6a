@@ -1,0 +1,49 @@
+From 46278f4cb21af4a43770e05a704b3ddfa39356d6 Mon Sep 17 00:00:00 2001
+From: Q6A port <port@local>
+Date: Sat, 31 Oct 2026 12:58:24 -0300
+Subject: [PATCH 12/13] drm/msm/dp: handle the HPD replug interrupt
+
+---
+ drivers/gpu/drm/msm/dp/dp_display.c      | 7 +++++++
+ drivers/gpu/drm/msm/dp/dp_display.c.orig | 7 +++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dp/dp_display.c b/drivers/gpu/drm/msm/dp/dp_display.c
+index d75414fb3..be0387dc8 100644
+--- a/drivers/gpu/drm/msm/dp/dp_display.c
++++ b/drivers/gpu/drm/msm/dp/dp_display.c
+@@ -1009,6 +1009,13 @@ static irqreturn_t msm_dp_display_irq_thread(int irq, void *dev_id)
+ 		drm_bridge_hpd_notify(dp->msm_dp_display.bridge,
+ 				      connector_status_connected);
+ 
++	if (hpd_isr_status & DP_DP_HPD_REPLUG_INT_MASK) {
++		drm_bridge_hpd_notify(dp->msm_dp_display.bridge,
++				      connector_status_disconnected);
++		drm_bridge_hpd_notify(dp->msm_dp_display.bridge,
++				      connector_status_connected);
++	}
++
+ 	/* Send HPD as connected and distinguish it in the notifier */
+ 	if (hpd_isr_status & DP_DP_IRQ_HPD_INT_MASK)
+ 		drm_bridge_hpd_notify(dp->msm_dp_display.bridge,
+diff --git a/drivers/gpu/drm/msm/dp/dp_display.c.orig b/drivers/gpu/drm/msm/dp/dp_display.c.orig
+index 4dcbd9b99..d75414fb3 100644
+--- a/drivers/gpu/drm/msm/dp/dp_display.c.orig
++++ b/drivers/gpu/drm/msm/dp/dp_display.c.orig
+@@ -1475,6 +1475,13 @@ void msm_dp_display_atomic_disable(struct msm_dp *dp)
+ 	if (!dp->power_on)
+ 		return;
+ 
++	/*
++	 * push_idle accesses link registers which require link clocks to be on.
++	 * Skip if the display was never powered on (e.g. eDP with no panel).
++	 */
++	if (!dp->power_on)
++		return;
++
+ 	msm_dp_ctrl_push_idle(msm_dp_display->ctrl);
+ }
+ 
+-- 
+2.53.0
+

@@ -1,0 +1,11 @@
+# Imagens finais, artefatos de build e caches (reproduzíveis via
+# scripts/build.sh, distribuídos via GitHub Releases -- não vão pro git)
+*.img
+*.img.xz
+*.img.xz.*
+output/
+rootfs/
+armbian-build/
+artifacts/
+*.tar
+*.tar.*

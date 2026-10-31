@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Instala no rootfs (output/rootfs):
+#   - kernel mainline 7.x (Armbian, edge-qcs6490; ou current via KERNEL_BRANCH) já baixado em artifacts/
+#   - linux-firmware completo do Ubuntu (pro hardware todo, incluindo ADSP/CDSP da Q6A --
+#     NÃO usamos o firmware vendor extraído em artifacts/firmware-qcs6490-dragon-q6a, que tem
+#     ABI incompatível com o driver de áudio mainline; ver docs/pesquisa.md §4.3)
+#   - o backport de alsa-ucm-conf da Radxa (fix do áudio, ver docs/pesquisa.md §2.2/§3.2)
+#
+# Tudo roda dentro de um container Docker privilegiado (root do container) + qemu-aarch64-static
+# pra fazer chroot em arm64 sem precisar de sudo no host (o rootfs é gerado com arquivos
+# root:root — só o root do container consegue escrever nele).
+#
+# Uso: scripts/02-install-kernel-firmware.sh
+set -euo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOTFS="$PROJECT_DIR/output/rootfs"
+KERNEL_BRANCH="${KERNEL_BRANCH:-edge}"
+KERNEL_DEBS="$PROJECT_DIR/artifacts/kernel-${KERNEL_BRANCH}-qcs6490"
+SCRIPTS_LIB="$PROJECT_DIR/scripts/lib"
+UCM_VER="1.2.16.1-radxa-1"
+UCM_URL="https://github.com/radxa-pkg/alsa-ucm-conf/releases/download/${UCM_VER}/alsa-ucm-conf_${UCM_VER}_all.deb"
+
+[ -d "$ROOTFS/etc" ] || { echo "Rootfs não encontrado em $ROOTFS — rode 01-build-rootfs.sh antes." >&2; exit 1; }
+
+echo ">>> Instalando kernel + firmware + fix de áudio dentro do rootfs (container Docker)..."
+docker run --rm --privileged \
+	-v "$ROOTFS":/rootfs \
+	-v "$KERNEL_DEBS":/kernel-debs:ro \
+	-v "$SCRIPTS_LIB":/scripts-lib:ro \
+	-e UCM_URL="$UCM_URL" \
+	ubuntu:24.04 bash /scripts-lib/provision-kernel-firmware.sh
+
+echo ">>> Pronto. Kernel instalado:"
+ls "$ROOTFS/usr/lib/modules/" 2>&1
+echo ">>> alsa-ucm-conf instalado:"
+grep -A1 "^Package: alsa-ucm-conf$" "$ROOTFS/var/lib/dpkg/status" 2>&1 | head -4
+echo ">>> Symlink do perfil de áudio da Q6A agora resolve?"
+ls -la "$ROOTFS/usr/share/alsa/ucm2/conf.d/qcs6490/QCS6490-Radxa-Dragon-Q6A.conf" 2>&1
+readlink -f "$ROOTFS/usr/share/alsa/ucm2/conf.d/qcs6490/QCS6490-Radxa-Dragon-Q6A.conf" 2>&1
